@@ -19,6 +19,6 @@ export class UpdateProductDto extends PartialType(CreateProductDto) {
   available?: boolean;
 
   @ValidateIf((o) => !o.name && !o.price && !o.description)
-  @IsString({ message: "At least one field must be provided" })
+  @IsString({ message: 'At least one field must be provided' })
   dummyField?: string;
 }
