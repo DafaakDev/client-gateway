@@ -1,9 +1,10 @@
-import { Controller, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { Body, Controller, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { Get, Post, Patch, Delete, Inject } from '@nestjs/common';
 import { PRODUCT_SERVICE } from '../config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from '../common';
-import { catchError, firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs';
+import { CreateProductDto } from './dto/create-product.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -12,8 +13,12 @@ export class ProductsController {
   ) {}
 
   @Post()
-  createProduct() {
-    return 'Esto deberia crear un producto';
+  createProduct(@Body() createProductDto: CreateProductDto) {
+    return this.productsClient.send({ cmd: 'create' }, createProductDto).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
   }
 
   @Get()
