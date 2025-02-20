@@ -3,7 +3,7 @@ import { Get, Post, Patch, Delete, Inject } from '@nestjs/common';
 import { PRODUCT_SERVICE } from '../config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from '../common';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom } from 'rxjs';
 
 @Controller('products')
 export class ProductsController {
@@ -22,15 +22,12 @@ export class ProductsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number) {
-    try {
-      const product = await firstValueFrom(
-        this.productsClient.send({ cmd: 'find_one' }, { id }),
-      );
-      return product;
-    } catch (error) {
-      throw new RpcException(error);
-    }
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.productsClient.send({ cmd: 'find_one' }, { id }).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
   }
 
   @Delete(':id')
