@@ -8,7 +8,7 @@ import {
 import { Get, Post, Patch, Delete, Inject } from '@nestjs/common';
 import { PRODUCT_SERVICE } from '../config';
 import { ClientProxy } from '@nestjs/microservices';
-import { PaginationDto } from '../common/dtos';
+import { PaginationDto } from '../common';
 import { firstValueFrom } from 'rxjs';
 
 @Controller('products')
@@ -26,6 +26,7 @@ export class ProductsController {
   findAllProducts(@Query() paginationDto: PaginationDto) {
     return this.productsClient.send({ cmd: 'find_all' }, paginationDto);
   }
+
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
