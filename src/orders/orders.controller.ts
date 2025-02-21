@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Inject,
-  ParseIntPipe,
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
@@ -18,7 +17,6 @@ import {
   ChangeOrderStatusDto,
 } from './dto';
 import { catchError } from 'rxjs';
-import { PaginationDto } from '../common';
 
 @Controller('orders')
 export class OrdersController {
