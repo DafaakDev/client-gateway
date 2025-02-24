@@ -33,7 +33,11 @@ export class OrdersController {
 
   @Get()
   findAll(@Query() orderPaginationDto: OrderPaginationDto) {
-    return this.natsClient.send('findAllOrders', orderPaginationDto);
+    return this.natsClient.send('findAllOrders', orderPaginationDto).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
   }
 
   @Get(':id')
