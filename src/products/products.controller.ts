@@ -1,6 +1,6 @@
 import { Body, Controller, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { Get, Post, Patch, Delete, Inject } from '@nestjs/common';
-import { PRODUCT_SERVICE } from '../config';
+import { NATS_SERVICE } from '../config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from '../common';
 import { catchError } from 'rxjs';
@@ -9,13 +9,11 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('products')
 export class ProductsController {
-  constructor(
-    @Inject(PRODUCT_SERVICE) private readonly productsClient: ClientProxy,
-  ) {}
+  constructor(@Inject(NATS_SERVICE) private readonly natsClient: ClientProxy) {}
 
   @Post()
   createProduct(@Body() createProductDto: CreateProductDto) {
-    return this.productsClient.send({ cmd: 'create' }, createProductDto).pipe(
+    return this.natsClient.send({ cmd: 'create' }, createProductDto).pipe(
       catchError((err) => {
         throw new RpcException(err);
       }),
@@ -24,12 +22,12 @@ export class ProductsController {
 
   @Get()
   findAllProducts(@Query() paginationDto: PaginationDto) {
-    return this.productsClient.send({ cmd: 'find_all' }, paginationDto);
+    return this.natsClient.send({ cmd: 'find_all' }, paginationDto);
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.productsClient.send({ cmd: 'find_one' }, { id }).pipe(
+    return this.natsClient.send({ cmd: 'find_one' }, { id }).pipe(
       catchError((err) => {
         throw new RpcException(err);
       }),
@@ -38,7 +36,7 @@ export class ProductsController {
 
   @Delete(':id')
   delete(@Param('id', ParseIntPipe) id: number) {
-    return this.productsClient.send({ cmd: 'delete' }, { id }).pipe(
+    return this.natsClient.send({ cmd: 'delete' }, { id }).pipe(
       catchError((err) => {
         throw new RpcException(err);
       }),
@@ -50,7 +48,7 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsClient
+    return this.natsClient
       .send({ cmd: 'update' }, { ...updateProductDto, id })
       .pipe(
         catchError((err) => {
