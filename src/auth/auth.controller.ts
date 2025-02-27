@@ -1,4 +1,4 @@
-import {Controller, Inject, Post} from '@nestjs/common';
+import {Controller, Get, Inject, Post} from '@nestjs/common';
 import {NATS_SERVICE} from "../config";
 import {ClientProxy, RpcException} from "@nestjs/microservices";
 import {catchError} from "rxjs";
@@ -27,7 +27,7 @@ export class AuthController {
         );
     }
 
-    @Post('verify')
+    @Get('verify')
     verify() {
         return this.natsClient.send('auth.verify.user', {}).pipe(
             catchError((err) => {
